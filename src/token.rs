@@ -2,7 +2,7 @@
 //Token is a struct representing a token from the source code
 #[derive(Debug)]
 pub struct Token {
-    content: char,
+    content: String,
     token_type: TokenType,
 }
 
@@ -16,17 +16,35 @@ pub enum TokenType {
     Literal,
     OpenBrace,
     CloseBrace,
+    Whitespace,
+    Unknown,
 }
 
 impl Token {
     pub fn tokenize(s: String) -> Result<Vec<Token>, ()> {
         let mut tokens: Vec<Token> = vec![];
         for item in s.chars() {
+            let token_type: TokenType;
+            token_type = if item.is_ascii_digit() {
+                TokenType::Literal
+            } else {
+                match item {
+                    ' ' => TokenType::Whitespace,
+                    '+' | '-' | '*' | '/' => TokenType::Operator,
+                    '(' => TokenType::OpenBrace,
+                    ')' => TokenType::CloseBrace,
+
+                    _ => TokenType::Unknown,
+                }
+            };
             tokens.push(Token {
-                content: item,
-                token_type: TokenType::Literal,
+                content: item.to_string(),
+                token_type: token_type,
             })
         }
+
         return Ok(tokens);
     }
 }
+
+
